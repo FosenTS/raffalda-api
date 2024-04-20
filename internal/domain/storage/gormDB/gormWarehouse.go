@@ -141,7 +141,7 @@ func (wR *warehouseRepository) GetWarehouseMerchandiseByWarehouseId(ctx context.
 	wMs := make([]*entity.WarehouseMerchandise, 0)
 	for _, wM := range wMCs {
 		var w *scheme.Warehouse
-		result := wR.db.Where("id = ?", wM.WarehouseId).First(&scheme.Warehouse{})
+		result := wR.db.Where("id = ?", wM.WarehouseId).First(&w)
 		if result.Error != nil {
 			logF.Errorln(result.Error)
 			return nil, result.Error
