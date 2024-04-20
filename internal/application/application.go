@@ -3,6 +3,7 @@ package application
 import (
 	"context"
 	"fmt"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"os"
 	"raffalda-api/internal/application/config"
 	"raffalda-api/internal/application/product"
@@ -104,6 +105,8 @@ func (app *app) runHTTP(ctx context.Context) error {
 	if app.httpCfg.UseCache {
 		fApp.Use(cache.New())
 	}
+
+	fApp.Use(cors.New())
 
 	fApp.Use(logger.New(
 		logger.Config{
