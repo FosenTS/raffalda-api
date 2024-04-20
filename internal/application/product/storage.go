@@ -57,12 +57,19 @@ func NewStorage(db *gorm.DB, log *logrus.Entry) (*Storage, error) {
 		return nil, err
 	}
 
+	marksStorage, err := gormDB.NewMarksRepository(db, log.WithField("location", "gorm-marks-repository"))
+	if err != nil {
+		logF.Errorln(err)
+		return nil, err
+	}
+
 	return &Storage{
 		User:          userStorage,
 		RefreshTokens: refreshTokenStorage,
 		Merchandise:   merchandiseStorage,
 		Warehouse:     warehouseStorage,
 		SoldPoint:     soldPointStorage,
+		Marks:         marksStorage,
 		Transaction:   transactionStorage,
 	}, nil
 }

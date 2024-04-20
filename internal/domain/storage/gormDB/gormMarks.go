@@ -18,14 +18,21 @@ type marksRepository struct {
 	log *logrus.Entry
 }
 
-func NewMarksRepository(db *gorm.DB, log *logrus.Entry) storage.Marks {
-	return &marksRepository{db: db, log: log}
+func NewMarksRepository(db *gorm.DB, log *logrus.Entry) (MarksRepository, error) {
+	logF := advancedlog.FunctionLog(log)
+	err := db.AutoMigrate(&scheme.Mark{})
+	if err != nil {
+		logF.Errorln(err)
+		return nil, err
+	}
+
+	return &marksRepository{db: db, log: log}, nil
 }
 
 func (mR *marksRepository) InsertMark(ctx context.Context, m *dto.MarkCreate) error {
 	logF := advancedlog.FunctionLog(mR.log)
 
-	result := mR.db.Create(&scheme.Mark{
+	result := mR.db.Create(scheme.Mark{
 		Type:      m.Type,
 		ObjectId:  m.ObjectId,
 		Latitude:  m.Latitude,
