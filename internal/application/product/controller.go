@@ -20,7 +20,7 @@ type Controller struct {
 func NewController(gateway *Gateway, metricsConfig config.MetricsConfig, log *logrus.Entry) *Controller {
 	middlew := middleware.NewMiddleware(gateway.Services.Auth, log.WithField("location", "middleware"))
 	return &Controller{
-		fiberController: fiberHTTP.NewFiberController(authhandler.NewHandlerAuth(gateway.Services.Auth, middlew, log.WithField("location", "handler-auth")), apihandler.NewHandlerApi(gateway.Services.WarehouseService, gateway.Services.MerchandiseParser, gateway.Services.MerchandiseService, gateway.Services.SoldPoint, gateway.Services.Transaction, log.WithField("location", "handler-api")), middlew),
+		fiberController: fiberHTTP.NewFiberController(authhandler.NewHandlerAuth(gateway.Services.Auth, middlew, log.WithField("location", "handler-auth")), apihandler.NewHandlerApi(gateway.Services.WarehouseService, gateway.Services.MerchandiseParser, gateway.Services.MerchandiseService, gateway.Services.SoldPoint, gateway.Services.Transaction, gateway.Services.AnalyzeService, log.WithField("location", "handler-api")), middlew),
 		metrics:         metrics.NewMetrics(metricsConfig, log.WithField("location", "metrics-listener")),
 	}
 }

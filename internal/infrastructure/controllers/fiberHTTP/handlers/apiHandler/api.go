@@ -11,6 +11,8 @@ import (
 )
 
 func (h *handlerApi) RegisterGroup(g fiber.Router) {
+	g.Get("/generalAnalyze", h.GeneralAnalyze)
+
 	g.Post("/test", h.Test)
 	g.Post("/parseData", h.ParseData)
 
@@ -30,6 +32,30 @@ func (h *handlerApi) RegisterGroup(g fiber.Router) {
 	g.Post("/storeTransaction", h.StoreTransaction)
 	g.Get("/getAllTransactions", h.GetAllTransaction)
 	g.Get("/getTransactionBy", h.GetTransactionBy)
+}
+
+func (h *handlerApi) GeneralAnalyze(ctx *fiber.Ctx) error {
+	logF := advancedlog.FunctionLog(h.log)
+
+	generalNotify := new(entity.GeneralWarehouseNotify)
+	if err := ctx.BodyParser(generalNotify); err != nil {
+		logF.Errorln(err)
+		return ctx.SendStatus(fiber.StatusBadRequest)
+	}
+
+	notifys, err := h.analyzeService.GeneralWarehouseAnalyze(ctx.Context())
+	if err != nil {
+		logF.Errorln(err)
+		return ctx.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	bodyMessage, err := json.Marshal(notifys)
+	if err != nil {
+		logF.Errorln(err)
+		return ctx.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	return ctx.Status(fiber.StatusOK).Send(bodyMessage)
 }
 
 func (h *handlerApi) Test(ctx *fiber.Ctx) error {

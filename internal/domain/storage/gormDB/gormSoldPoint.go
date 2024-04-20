@@ -33,7 +33,12 @@ func NewGormSoldPointRepository(db *gorm.DB, log *logrus.Entry) (GormSoldPointRe
 func (sR *gormSoldPointRepository) InsertSoldPoint(ctx context.Context, sP *dto.SoldPointCreate) error {
 	logF := advancedlog.FunctionLog(sR.log)
 
-	result := *sR.db.Create(sP)
+	sPF := scheme.SoldPoint{
+		Region:  sP.Region,
+		Name:    sP.Name,
+		Address: sP.Address,
+	}
+	result := *sR.db.Create(&sPF)
 	if result.Error != nil {
 		logF.Errorln(result.Error)
 		return result.Error
