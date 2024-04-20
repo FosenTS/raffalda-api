@@ -49,7 +49,7 @@ func (h *handlerApi) GeneralAnalyze(ctx *fiber.Ctx) error {
 		return ctx.SendStatus(fiber.StatusInternalServerError)
 	}
 
-	return ctx.Status(fiber.StatusOK).Send(bodyMessage)
+	return ctx.Status(fiber.StatusOK).JSON(bodyMessage)
 }
 
 func (h *handlerApi) Test(ctx *fiber.Ctx) error {
@@ -105,7 +105,7 @@ func (h *handlerApi) GetAllSoldPoint(ctx *fiber.Ctx) error {
 		return ctx.SendStatus(fiber.StatusInternalServerError)
 	}
 
-	return ctx.Status(fiber.StatusOK).Send(bodyMessage)
+	return ctx.Status(fiber.StatusOK).JSON(bodyMessage)
 }
 
 func (h *handlerApi) GetSoldPointById(ctx *fiber.Ctx) error {
@@ -127,7 +127,7 @@ func (h *handlerApi) GetSoldPointById(ctx *fiber.Ctx) error {
 		return ctx.SendStatus(fiber.StatusInternalServerError)
 	}
 
-	return ctx.Status(fiber.StatusOK).Send(bodyMessage)
+	return ctx.Status(fiber.StatusOK).JSON(bodyMessage)
 }
 
 func (h *handlerApi) GetAllMerchandiseMoreInfo(ctx *fiber.Ctx) error {
@@ -145,7 +145,7 @@ func (h *handlerApi) GetAllMerchandiseMoreInfo(ctx *fiber.Ctx) error {
 		return ctx.SendStatus(fiber.StatusInternalServerError)
 	}
 
-	return ctx.Status(fiber.StatusOK).Send(bodyMessage)
+	return ctx.Status(fiber.StatusOK).JSON(bodyMessage)
 }
 
 func (h *handlerApi) StoreWarehouseMerchandise(ctx *fiber.Ctx) error {
@@ -219,7 +219,7 @@ func (h *handlerApi) GetAllWarehouse(ctx *fiber.Ctx) error {
 			return ctx.SendStatus(fiber.StatusInternalServerError)
 		}
 
-		return ctx.Status(fiber.StatusOK).Send(bodyResponse)
+		return ctx.Status(fiber.StatusOK).JSON(bodyResponse)
 	}
 
 	warehouses, err := h.warehousService.GetAll(ctx.Context())
@@ -234,7 +234,7 @@ func (h *handlerApi) GetAllWarehouse(ctx *fiber.Ctx) error {
 		return ctx.SendStatus(fiber.StatusInternalServerError)
 	}
 
-	return ctx.Status(fiber.StatusOK).Send(bodyResponse)
+	return ctx.Status(fiber.StatusOK).JSON(bodyResponse)
 }
 
 func (h *handlerApi) UpdateWarehouse(ctx *fiber.Ctx) error {
@@ -277,7 +277,7 @@ func (h *handlerApi) GetWarehouseById(ctx *fiber.Ctx) error {
 		return ctx.SendStatus(fiber.StatusInternalServerError)
 	}
 
-	return ctx.Status(fiber.StatusOK).Send(bodyResponce)
+	return ctx.Status(fiber.StatusOK).JSON(bodyResponce)
 }
 
 func (h *handlerApi) StoreTransaction(ctx *fiber.Ctx) error {
@@ -336,7 +336,7 @@ func (h *handlerApi) GetTransactionBy(ctx *fiber.Ctx) error {
 		return ctx.SendStatus(fiber.StatusInternalServerError)
 	}
 
-	return ctx.Status(fiber.StatusOK).Send(bodyResponse)
+	return ctx.Status(fiber.StatusOK).JSON(bodyResponse)
 }
 
 func (h *handlerApi) GetAllTransaction(ctx *fiber.Ctx) error {
@@ -353,7 +353,7 @@ func (h *handlerApi) GetAllTransaction(ctx *fiber.Ctx) error {
 		return ctx.SendStatus(fiber.StatusInternalServerError)
 	}
 
-	return ctx.Status(fiber.StatusOK).Send(bodyResponse)
+	return ctx.Status(fiber.StatusOK).JSON(bodyResponse)
 }
 
 func (h *handlerApi) DeleteTransaction(ctx *fiber.Ctx) error {

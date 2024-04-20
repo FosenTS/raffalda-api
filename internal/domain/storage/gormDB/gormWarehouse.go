@@ -178,6 +178,7 @@ func (wR *warehouseRepository) GetAllWarehouseMerchandise(ctx context.Context) (
 		wMs = append(wMs, &entity.WarehouseMerchandise{
 			Id:              wM.Id,
 			WarehouseId:     wM.WarehouseId,
+			WarehouseName:   warehouse.Name,
 			ProductName:     wM.ProductName,
 			ProductCost:     wM.ProductCost,
 			ManufactureDate: wM.ManufactureDate,
