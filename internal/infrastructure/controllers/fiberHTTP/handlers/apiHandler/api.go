@@ -18,6 +18,7 @@ func (h *handlerApi) RegisterGroup(g fiber.Router) {
 	g.Post("/storeWarehouse", h.StoreWarehouse)
 
 	g.Post("/storeWarehouseMerchandise", h.StoreWarehouseMerchandise)
+	g.Get("/getAllMerchandiseMoreInfo", h.GetAllMerchandiseMoreInfo)
 }
 
 func (h *handlerApi) Test(ctx *fiber.Ctx) error {
@@ -40,6 +41,24 @@ func (h *handlerApi) ParseData(ctx *fiber.Ctx) error {
 	}
 
 	return ctx.SendStatus(fiber.StatusOK)
+}
+
+func (h *handlerApi) GetAllMerchandiseMoreInfo(ctx *fiber.Ctx) error {
+	page := ctx.QueryInt("page")
+
+	ms, err := h.warehousService.GetAllMerchandiseMoreInfo(ctx.Context(), uint(page))
+	if err != nil {
+		h.log.Errorln(err)
+		return err
+	}
+
+	bodyMessage, err := json.Marshal(ms)
+	if err != nil {
+		h.log.Errorln(err)
+		return ctx.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	return ctx.Status(fiber.StatusOK).Send(bodyMessage)
 }
 
 func (h *handlerApi) StoreWarehouseMerchandise(ctx *fiber.Ctx) error {

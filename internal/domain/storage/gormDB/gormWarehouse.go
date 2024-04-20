@@ -80,7 +80,7 @@ func (wR *warehouseRepository) GetAllWarehouseMerchandise(ctx context.Context) (
 			ProductName:     wM.ProductName,
 			ProductCost:     wM.ProductCost,
 			ManufactureDate: wM.ManufactureDate,
-			ExpiryDate:      wM.ExpiryDate,
+			ExpireDate:      wM.ExpiryDate,
 			SKU:             wM.SKU,
 			Quantity:        wM.Quantity,
 			Measure:         wM.Measure,
