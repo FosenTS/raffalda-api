@@ -31,6 +31,7 @@ type Warehouse interface {
 	StoreWarehouseMerchandise(ctx context.Context, wM *dto.WarehouseMerchandiseCreate) error
 	UpdateWarehouseMerchandise(ctx context.Context, wM *dto.WarehouseMerchandise) error
 	GetAllAndMoreInfo(ctx context.Context) ([]*entity.WarehouseMoreInfo, error)
+	GetWarehouseMerchandiseByWarehouseId(ctx context.Context, id uint) ([]*entity.WarehouseMerchandise, error)
 
 	GetAllMerchandiseMoreInfo(ctx context.Context, num uint) ([]*entity.MerchandiseMoreInfo, error)
 }
@@ -339,4 +340,34 @@ func (wH *warehouse) GetAllAndMoreInfo(ctx context.Context) ([]*entity.Warehouse
 		})
 	}
 	return wmis, nil
+}
+
+func (wH *warehouse) GetWarehouseMerchandiseById(ctx context.Context, id uint) (*entity.WarehouseMerchandise, error) {
+	logF := advancedlog.FunctionLog(wH.log)
+	wm, err := wH.warehouseStorage.GetWarehouseMerchandiseById(ctx, id)
+	if err != nil {
+		logF.Errorln(err)
+		return nil, err
+	}
+	return wm, nil
+}
+
+func (wH *warehouse) GetWarehouseMerchandiseByWarehouseId(ctx context.Context, id uint) ([]*entity.WarehouseMerchandise, error) {
+	logF := advancedlog.FunctionLog(wH.log)
+	wms, err := wH.warehouseStorage.GetWarehouseMerchandiseByWarehouseId(ctx, id)
+	if err != nil {
+		logF.Errorln(err)
+		return nil, err
+	}
+	return wms, nil
+}
+
+func (wH *warehouse) DeleteWarehouseMerchandise(ctx context.Context, id uint) error {
+	logF := advancedlog.FunctionLog(wH.log)
+	err := wH.warehouseStorage.DeleteWarehouseMerchandiseById(ctx, id)
+	if err != nil {
+		logF.Errorln(err)
+		return err
+	}
+	return nil
 }

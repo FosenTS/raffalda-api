@@ -25,6 +25,7 @@ func (h *handlerApi) RegisterGroup(g fiber.Router) {
 	g.Post("/storeWarehouseMerchandise", h.StoreWarehouseMerchandise)
 	g.Post("/updateWarehouseMerchandise", h.UpdateWarehouseMerchandise)
 	g.Get("/getAllMerchandiseMoreInfo", h.GetAllMerchandiseMoreInfo)
+	g.Get("/getMerchandiseByWarehouseId", h.GetWarehouseMerchandiseById)
 
 	g.Post("/storeSoldPoint", h.StoreSoldPoint)
 	g.Get("/getAllSoldPoint", h.GetAllSoldPoint)
@@ -145,6 +146,22 @@ func (h *handlerApi) GetAllMerchandiseMoreInfo(ctx *fiber.Ctx) error {
 	//	h.log.Errorln(err)
 	//	return ctx.SendStatus(fiber.StatusInternalServerError)
 	//}
+
+	return ctx.Status(fiber.StatusOK).JSON(ms)
+}
+
+func (h *handlerApi) GetWarehouseMerchandiseById(ctx *fiber.Ctx) error {
+	idC := ctx.Query("id")
+	id, err := strconv.Atoi(idC)
+	if err != nil {
+		h.log.Errorln(err)
+		return ctx.SendStatus(fiber.StatusBadRequest)
+	}
+	ms, err := h.warehousService.GetWarehouseMerchandiseByWarehouseId(ctx.Context(), uint(id))
+	if err != nil {
+		h.log.Errorln(err)
+		return err
+	}
 
 	return ctx.Status(fiber.StatusOK).JSON(ms)
 }
