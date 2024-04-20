@@ -35,6 +35,39 @@ func (h *handlerApi) RegisterGroup(g fiber.Router) {
 	g.Get("/getAllTransactions", h.GetAllTransaction)
 	g.Get("/getTransactionBy", h.GetTransactionBy)
 	g.Get("/getTransactionStatsByWarehouseId", h.GetTransactionStatsByWarehouseId)
+
+	g.Post("/storeMark", h.StoreMark)
+	g.Get("/getAllMark", h.GetAllMark)
+}
+
+func (h *handlerApi) StoreMark(ctx *fiber.Ctx) error {
+	logF := advancedlog.FunctionLog(h.log)
+
+	mark := new(dto.MarkCreate)
+	if err := ctx.BodyParser(mark); err != nil {
+		logF.Errorln(err)
+		return ctx.SendStatus(fiber.StatusBadRequest)
+	}
+
+	err := h.marksService.InsertMark(ctx.Context(), mark)
+	if err != nil {
+		logF.Errorln(err)
+		return ctx.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	return ctx.SendStatus(fiber.StatusOK)
+}
+
+func (h *handlerApi) GetAllMark(ctx *fiber.Ctx) error {
+	logF := advancedlog.FunctionLog(h.log)
+
+	marks, err := h.marksService.GetAllMarks(ctx.Context())
+	if err != nil {
+		logF.Errorln(err)
+		return ctx.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(marks)
 }
 
 func (h *handlerApi) GeneralAnalyze(ctx *fiber.Ctx) error {
