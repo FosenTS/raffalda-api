@@ -12,7 +12,6 @@ import (
 
 	"github.com/alitto/pond"
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cache"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/monitor"
 	"github.com/weaveworks/promrus"
@@ -102,9 +101,9 @@ func (app *app) runHTTP(ctx context.Context) error {
 		Concurrency: int(app.httpCfg.MaxConcurrentConnection),
 	})
 
-	if app.httpCfg.UseCache {
-		fApp.Use(cache.New())
-	}
+	//if app.httpCfg.UseCache {
+	//	fApp.Use(cache.New())
+	//}
 
 	fApp.Use(cors.New())
 
