@@ -205,34 +205,11 @@ func (h *handlerApi) StoreWarehouse(ctx *fiber.Ctx) error {
 func (h *handlerApi) GetAllWarehouse(ctx *fiber.Ctx) error {
 	logF := advancedlog.FunctionLog(h.log)
 
-	isMoreInfo := ctx.QueryBool("isMore")
-	if isMoreInfo {
-		warehouses, err := h.warehousService.GetAllAndMoreInfo(ctx.Context())
-		if err != nil {
-			logF.Errorln(err)
-			return ctx.SendStatus(fiber.StatusInternalServerError)
-		}
-		//
-		//bodyResponse, err := json.Marshal(warehouses)
-		//if err != nil {
-		//	logF.Errorln(err)
-		//	return ctx.SendStatus(fiber.StatusInternalServerError)
-		//}
-
-		return ctx.Status(fiber.StatusOK).JSON(warehouses)
-	}
-
-	warehouses, err := h.warehousService.GetAll(ctx.Context())
+	warehouses, err := h.warehousService.GetAllAndMoreInfo(ctx.Context())
 	if err != nil {
 		logF.Errorln(err)
 		return ctx.SendStatus(fiber.StatusInternalServerError)
 	}
-	//
-	//bodyResponse, err := json.Marshal(warehouses)
-	//if err != nil {
-	//	logF.Errorln(err)
-	//	return ctx.SendStatus(fiber.StatusInternalServerError)
-	//}
 
 	return ctx.Status(fiber.StatusOK).JSON(warehouses)
 }
