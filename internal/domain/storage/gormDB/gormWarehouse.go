@@ -169,6 +169,12 @@ func (wR *warehouseRepository) GetAllWarehouseMerchandise(ctx context.Context) (
 
 	wMs := make([]*entity.WarehouseMerchandise, 0)
 	for _, wM := range wMCs {
+		var warehouse *scheme.Warehouse
+		result := wR.db.Where("id = ?", wM.Id).First(&warehouse)
+		if result.Error != nil {
+			logF.Errorln(result.Error)
+			return nil, result.Error
+		}
 		wMs = append(wMs, &entity.WarehouseMerchandise{
 			Id:              wM.Id,
 			WarehouseId:     wM.WarehouseId,

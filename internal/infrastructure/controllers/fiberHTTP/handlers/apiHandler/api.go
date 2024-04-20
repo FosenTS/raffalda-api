@@ -37,12 +37,6 @@ func (h *handlerApi) RegisterGroup(g fiber.Router) {
 func (h *handlerApi) GeneralAnalyze(ctx *fiber.Ctx) error {
 	logF := advancedlog.FunctionLog(h.log)
 
-	generalNotify := new(entity.GeneralWarehouseNotify)
-	if err := ctx.BodyParser(generalNotify); err != nil {
-		logF.Errorln(err)
-		return ctx.SendStatus(fiber.StatusBadRequest)
-	}
-
 	notifys, err := h.analyzeService.GeneralWarehouseAnalyze(ctx.Context())
 	if err != nil {
 		logF.Errorln(err)

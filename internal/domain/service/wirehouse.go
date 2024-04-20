@@ -122,6 +122,7 @@ func (wH *warehouse) GetAllMerchandiseMoreInfo(ctx context.Context, num uint) ([
 		mmi = append(mmi, &entity.MerchandiseMoreInfo{
 			Id:               m.Id,
 			WarehouseId:      m.WarehouseId,
+			WarehouseName:    m.WarehouseName,
 			ProductName:      m.ProductName,
 			ProductCost:      m.ProductCost,
 			ManufactureDate:  m.ManufactureDate,
