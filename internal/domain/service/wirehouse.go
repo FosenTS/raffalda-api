@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"raffalda-api/internal/domain/entity"
 	"raffalda-api/internal/domain/storage"
 	"raffalda-api/internal/domain/storage/dto"
@@ -11,12 +12,21 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+var (
+	errWarehouseOverflowing   = errors.New("warehouse overflowing")
+	errWarehouseEmpty         = errors.New("warehouse empty")
+	errMerchandiseEmpty       = errors.New("merchandise empty")
+	errUnableToChangeCapacity = errors.New("unable to change capacity")
+)
+
 type Warehouse interface {
 	StoreNewWarehouse(ctx context.Context, wC *dto.WarehouseCreate) error
+	UpdateWarehouse(ctx context.Context, w *dto.Warehouse) error
 	GetAll(ctx context.Context) ([]*entity.Warehouse, error)
 	GetById(ctx context.Context, id uint) (*entity.Warehouse, error)
 
 	StoreWarehouseMerchandise(ctx context.Context, wM *dto.WarehouseMerchandiseCreate) error
+	UpdateWarehouseMerchandise(ctx context.Context, wM *dto.WarehouseMerchandise) error
 	GetAllAndMoreInfo(ctx context.Context) ([]*entity.WarehouseMoreInfo, error)
 
 	GetAllMerchandiseMoreInfo(ctx context.Context, num uint) ([]*entity.MerchandiseMoreInfo, error)
@@ -46,6 +56,20 @@ func (wH *warehouse) StoreNewWarehouse(ctx context.Context, wC *dto.WarehouseCre
 		return nil
 	}
 
+	return nil
+}
+
+func (wH *warehouse) UpdateWarehouse(ctx context.Context, w *dto.Warehouse) error {
+	logF := advancedlog.FunctionLog(wH.log)
+	if w.Capacity > w.Volume {
+		logF.Errorln(errUnableToChangeCapacity)
+		return errUnableToChangeCapacity
+	}
+	err := wH.warehouseStorage.UpdateWarehouse(ctx, w)
+	if err != nil {
+		logF.Errorln(err)
+		return err
+	}
 	return nil
 }
 
@@ -133,6 +157,67 @@ func (wH *warehouse) StoreWarehouseMerchandise(ctx context.Context, wM *dto.Ware
 		return err
 	}
 
+	warehouse, err := wH.warehouseStorage.GetWarehouseById(ctx, wM.WarehouseId)
+	if err != nil {
+		logF.Errorln(err)
+		return err
+	}
+
+	warehouse.Volume += wM.Quantity
+	if warehouse.Volume > warehouse.Capacity {
+		logF.Errorln(errWarehouseOverflowing)
+		return errWarehouseOverflowing
+	}
+	err = wH.warehouseStorage.UpdateWarehouse(ctx, &dto.Warehouse{
+		Id:       warehouse.ID,
+		Name:     warehouse.Name,
+		Volume:   warehouse.Volume,
+		Capacity: warehouse.Capacity,
+	})
+	if err != nil {
+		logF.Errorln(err)
+		return err
+	}
+
+	return nil
+}
+
+func (wH *warehouse) UpdateWarehouseMerchandise(ctx context.Context, wM *dto.WarehouseMerchandise) error {
+	logF := advancedlog.FunctionLog(wH.log)
+
+	oldWarehouseMerchandise, err := wH.warehouseStorage.GetWarehouseMerchandiseById(ctx, wM.Id)
+	if err != nil {
+		logF.Errorln(err)
+		return err
+	}
+
+	warehouse, err := wH.warehouseStorage.GetWarehouseById(ctx, wM.WarehouseId)
+	if err != nil {
+		logF.Errorln(err)
+		return err
+	}
+	warehouse.Volume = warehouse.Volume - oldWarehouseMerchandise.Quantity + wM.Quantity
+	if warehouse.Volume > warehouse.Capacity {
+		logF.Errorln(errWarehouseOverflowing)
+		return errWarehouseOverflowing
+	}
+	err = wH.warehouseStorage.UpdateWarehouse(ctx, &dto.Warehouse{
+		Id:       warehouse.ID,
+		Name:     warehouse.Name,
+		Volume:   warehouse.Volume,
+		Capacity: warehouse.Capacity,
+	})
+	if err != nil {
+		logF.Errorln(err)
+		return err
+	}
+
+	err = wH.warehouseStorage.UpdateWarehouseMerchandise(ctx, wM)
+	if err != nil {
+		logF.Errorln(err)
+		return err
+	}
+
 	return nil
 }
 
@@ -145,18 +230,11 @@ func (wH *warehouse) GetAllAndMoreInfo(ctx context.Context) ([]*entity.Warehouse
 		return nil, err
 	}
 
-	ms, err := wH.warehouseStorage.GetAllWarehouseMerchandise(ctx)
-	if err != nil {
-		logF.Errorln(err)
-		return nil, err
-	}
-
 	for _, w := range warehouses {
-		moreInfos := make([]*entity.WarehouseMerchandise, 0)
-		for _, m := range ms {
-			if w.ID == m.WarehouseId {
-				moreInfos = append(moreInfos, m)
-			}
+		moreInfos, err := wH.warehouseStorage.GetWarehouseMerchandiseByWarehouseId(ctx, w.ID)
+		if err != nil {
+			logF.Errorln(err)
+			return nil, err
 		}
 		wmis = append(wmis, &entity.WarehouseMoreInfo{
 			Id:           w.ID,

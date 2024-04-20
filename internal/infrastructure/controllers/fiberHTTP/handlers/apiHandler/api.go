@@ -2,6 +2,7 @@ package apihandler
 
 import (
 	"encoding/json"
+	"raffalda-api/internal/domain/entity"
 	"raffalda-api/internal/domain/storage/dto"
 	"raffalda-api/pkg/advancedlog"
 	"strconv"
@@ -14,11 +15,21 @@ func (h *handlerApi) RegisterGroup(g fiber.Router) {
 	g.Post("/parseData", h.ParseData)
 
 	g.Get("/getWarehouses", h.GetAllWarehouse)
+	g.Post("/updateWarehouse", h.UpdateWarehouse)
 	g.Get("/getWarehouseById", h.GetWarehouseById)
 	g.Post("/storeWarehouse", h.StoreWarehouse)
 
 	g.Post("/storeWarehouseMerchandise", h.StoreWarehouseMerchandise)
+	g.Post("/updateWarehouseMerchandise", h.UpdateWarehouseMerchandise)
 	g.Get("/getAllMerchandiseMoreInfo", h.GetAllMerchandiseMoreInfo)
+
+	g.Post("/storeSoldPoint", h.StoreSoldPoint)
+	g.Get("/getAllSoldPoint", h.GetAllSoldPoint)
+	g.Get("/getSoldPointById", h.GetSoldPointById)
+
+	g.Post("/storeTransaction", h.StoreTransaction)
+	g.Get("/getAllTransactions", h.GetAllTransaction)
+	g.Get("/getTransactionBy", h.GetTransactionBy)
 }
 
 func (h *handlerApi) Test(ctx *fiber.Ctx) error {
@@ -41,6 +52,62 @@ func (h *handlerApi) ParseData(ctx *fiber.Ctx) error {
 	}
 
 	return ctx.SendStatus(fiber.StatusOK)
+}
+func (h *handlerApi) StoreSoldPoint(ctx *fiber.Ctx) error {
+	logF := advancedlog.FunctionLog(h.log)
+
+	sP := new(dto.SoldPointCreate)
+	if err := ctx.BodyParser(sP); err != nil {
+		logF.Errorln(err)
+		return ctx.SendStatus(fiber.StatusBadRequest)
+	}
+
+	err := h.soldPointService.StoreSoldPoint(ctx.Context(), sP)
+	if err != nil {
+		logF.Errorln(err)
+		return ctx.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	return ctx.SendStatus(fiber.StatusOK)
+}
+
+func (h *handlerApi) GetAllSoldPoint(ctx *fiber.Ctx) error {
+
+	sP, err := h.soldPointService.GetAllSoldPoints(ctx.Context())
+	if err != nil {
+		h.log.Errorln(err)
+		return err
+	}
+
+	bodyMessage, err := json.Marshal(sP)
+	if err != nil {
+		h.log.Errorln(err)
+		return ctx.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	return ctx.Status(fiber.StatusOK).Send(bodyMessage)
+}
+
+func (h *handlerApi) GetSoldPointById(ctx *fiber.Ctx) error {
+	idC := ctx.Query("id")
+	id, err := strconv.Atoi(idC)
+	if err != nil {
+		h.log.Errorln(err)
+		return ctx.SendStatus(fiber.StatusBadRequest)
+	}
+	sP, err := h.soldPointService.GetSoldPointById(ctx.Context(), uint(id))
+	if err != nil {
+		h.log.Errorln(err)
+		return err
+	}
+
+	bodyMessage, err := json.Marshal(sP)
+	if err != nil {
+		h.log.Errorln(err)
+		return ctx.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	return ctx.Status(fiber.StatusOK).Send(bodyMessage)
 }
 
 func (h *handlerApi) GetAllMerchandiseMoreInfo(ctx *fiber.Ctx) error {
@@ -71,6 +138,24 @@ func (h *handlerApi) StoreWarehouseMerchandise(ctx *fiber.Ctx) error {
 	}
 
 	err := h.warehousService.StoreWarehouseMerchandise(ctx.Context(), warehouseMerchandiseCreate)
+	if err != nil {
+		logF.Errorln(err)
+		return ctx.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	return ctx.SendStatus(fiber.StatusOK)
+}
+
+func (h *handlerApi) UpdateWarehouseMerchandise(ctx *fiber.Ctx) error {
+	logF := advancedlog.FunctionLog(h.log)
+
+	warehouseMerchandiseUpdate := new(dto.WarehouseMerchandise)
+	if err := ctx.BodyParser(warehouseMerchandiseUpdate); err != nil {
+		logF.Errorln(err)
+		return ctx.SendStatus(fiber.StatusBadRequest)
+	}
+
+	err := h.warehousService.UpdateWarehouseMerchandise(ctx.Context(), warehouseMerchandiseUpdate)
 	if err != nil {
 		logF.Errorln(err)
 		return ctx.SendStatus(fiber.StatusInternalServerError)
@@ -132,6 +217,24 @@ func (h *handlerApi) GetAllWarehouse(ctx *fiber.Ctx) error {
 	return ctx.Status(fiber.StatusOK).Send(bodyResponse)
 }
 
+func (h *handlerApi) UpdateWarehouse(ctx *fiber.Ctx) error {
+	logF := advancedlog.FunctionLog(h.log)
+
+	warehouseUpdate := new(dto.Warehouse)
+	if err := ctx.BodyParser(warehouseUpdate); err != nil {
+		logF.Errorln(err)
+		return ctx.SendStatus(fiber.StatusBadRequest)
+	}
+
+	err := h.warehousService.UpdateWarehouse(ctx.Context(), warehouseUpdate)
+	if err != nil {
+		logF.Errorln(err)
+		return ctx.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	return ctx.SendStatus(fiber.StatusOK)
+}
+
 func (h *handlerApi) GetWarehouseById(ctx *fiber.Ctx) error {
 	logF := advancedlog.FunctionLog(h.log)
 
@@ -155,4 +258,97 @@ func (h *handlerApi) GetWarehouseById(ctx *fiber.Ctx) error {
 	}
 
 	return ctx.Status(fiber.StatusOK).Send(bodyResponce)
+}
+
+func (h *handlerApi) StoreTransaction(ctx *fiber.Ctx) error {
+	logF := advancedlog.FunctionLog(h.log)
+
+	transactionCreate := new(dto.TransactionCreate)
+	if err := ctx.BodyParser(transactionCreate); err != nil {
+		logF.Errorln(err)
+		return ctx.SendStatus(fiber.StatusBadRequest)
+	}
+
+	err := h.transactionService.InsertTransaction(ctx.Context(), transactionCreate)
+	if err != nil {
+		logF.Errorln(err)
+		return ctx.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	return ctx.SendStatus(fiber.StatusOK)
+}
+
+func (h *handlerApi) GetTransactionBy(ctx *fiber.Ctx) error {
+	logF := advancedlog.FunctionLog(h.log)
+
+	var transaction *entity.TransactionInfo
+	var err error
+	id := ctx.QueryInt("id")
+	if id != 0 {
+		transaction, err = h.transactionService.GetTransactionById(ctx.Context(), uint(id))
+		if err != nil {
+			logF.Errorln(err)
+			return err
+		}
+	} else if ctx.QueryInt("warehouseId") != 0 {
+		transaction, err = h.transactionService.GetTransactionByWarehousesId(ctx.Context(), uint(ctx.QueryInt("warehouseId")))
+		if err != nil {
+			logF.Errorln(err)
+			return err
+		} else if ctx.QueryInt("soldPointId") != 0 {
+			transaction, err = h.transactionService.GetTransactionBySoldPointId(ctx.Context(), uint(ctx.QueryInt("soldPointId")))
+			if err != nil {
+				logF.Errorln(err)
+				return err
+			} else if ctx.QueryInt("merchandiseId") != 0 {
+				transaction, err = h.transactionService.GetTransactionByMerchandiseId(ctx.Context(), uint(ctx.QueryInt("merchandiseId")))
+				if err != nil {
+					logF.Errorln(err)
+					return err
+				}
+			}
+		}
+	}
+
+	bodyResponse, err := json.Marshal(transaction)
+	if err != nil {
+		logF.Errorln(err)
+		return ctx.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	return ctx.Status(fiber.StatusOK).Send(bodyResponse)
+}
+
+func (h *handlerApi) GetAllTransaction(ctx *fiber.Ctx) error {
+	logF := advancedlog.FunctionLog(h.log)
+	transactions, err := h.transactionService.GetAllTransactions(ctx.Context())
+	if err != nil {
+		logF.Errorln(err)
+		return ctx.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	bodyResponse, err := json.Marshal(transactions)
+	if err != nil {
+		logF.Errorln(err)
+		return ctx.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	return ctx.Status(fiber.StatusOK).Send(bodyResponse)
+}
+
+func (h *handlerApi) DeleteTransaction(ctx *fiber.Ctx) error {
+	logF := advancedlog.FunctionLog(h.log)
+	idC := ctx.Query("id")
+	id, err := strconv.Atoi(idC)
+	if err != nil {
+		logF.Errorln(err)
+		return ctx.SendStatus(fiber.StatusBadRequest)
+	}
+	err = h.transactionService.DeleteTransaction(ctx.Context(), uint(id))
+	if err != nil {
+		logF.Errorln(err)
+		return ctx.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	return ctx.SendStatus(fiber.StatusOK)
 }

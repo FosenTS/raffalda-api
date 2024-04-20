@@ -14,6 +14,8 @@ type Services struct {
 	MerchandiseParser  service.MerchandiseParser
 	MerchandiseService service.MerchandiseService
 	WarehouseService   service.Warehouse
+	SoldPoint          service.SoldPoint
+	Transaction        service.Transaction
 }
 
 func NewServices(
@@ -33,10 +35,16 @@ func NewServices(
 
 	warehouse := service.NewWarehouse(storage.Warehouse, storage.Merchandise, log.WithField("location", "warehouse-service"))
 
+	soldPoint := service.NewSoldPoint(storage.SoldPoint, log.WithField("location", "sold-point-service"))
+
+	transaction := service.NewTransaction(storage.Transaction, storage.Warehouse, storage.SoldPoint, log.WithField("location", "transaction-service"))
+
 	return &Services{
 		Auth:               authService,
 		MerchandiseParser:  merchandiseParser,
 		MerchandiseService: merchandise,
 		WarehouseService:   warehouse,
+		SoldPoint:          soldPoint,
+		Transaction:        transaction,
 	}
 }

@@ -61,6 +61,101 @@ func (wR *warehouseRepository) InsertWarehouseMerchandise(ctx context.Context, w
 	return nil
 }
 
+func (wR *warehouseRepository) UpdateWarehouse(ctx context.Context, w *dto.Warehouse) error {
+	logF := advancedlog.FunctionLog(wR.log)
+
+	wF := scheme.Warehouse{
+		Name:     w.Name,
+		Volume:   w.Volume,
+		Capacity: w.Capacity,
+	}
+
+	result := wR.db.Model(&scheme.Warehouse{}).Where("id = ?", w.Id).Updates(wF)
+	if result.Error != nil {
+		logF.Errorln(result.Error)
+		return result.Error
+	}
+
+	return nil
+}
+
+func (wR *warehouseRepository) UpdateWarehouseMerchandise(ctx context.Context, wM *dto.WarehouseMerchandise) error {
+	logF := advancedlog.FunctionLog(wR.log)
+
+	wMF := scheme.WarehouseMerchandise{
+		WarehouseId:     wM.WarehouseId,
+		ProductName:     wM.ProductName,
+		ProductCost:     wM.ProductCost,
+		ManufactureDate: wM.ManufactureDate,
+		ExpiryDate:      wM.ExpireDate,
+		SKU:             wM.SKU,
+		Quantity:        wM.Quantity,
+		Measure:         wM.Measure,
+	}
+
+	result := wR.db.Model(&scheme.WarehouseMerchandise{}).Where("id = ?", wM.Id).Updates(wMF)
+	if result.Error != nil {
+		logF.Errorln(result.Error)
+		return result.Error
+	}
+
+	return nil
+}
+
+func (wR *warehouseRepository) GetWarehouseMerchandiseById(ctx context.Context, id uint) (*entity.WarehouseMerchandise, error) {
+	logF := advancedlog.FunctionLog(wR.log)
+	var wM *scheme.WarehouseMerchandise
+
+	result := wR.db.Where("id = ?", id).First(&wM)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+
+		logF.Errorln(result.Error)
+		return nil, result.Error
+	}
+
+	return &entity.WarehouseMerchandise{
+		Id:              wM.Id,
+		WarehouseId:     wM.WarehouseId,
+		ProductName:     wM.ProductName,
+		ProductCost:     wM.ProductCost,
+		ManufactureDate: wM.ManufactureDate,
+		ExpireDate:      wM.ExpiryDate,
+		SKU:             wM.SKU,
+		Quantity:        wM.Quantity,
+		Measure:         wM.Measure,
+	}, nil
+}
+
+func (wR *warehouseRepository) GetWarehouseMerchandiseByWarehouseId(ctx context.Context, id uint) ([]*entity.WarehouseMerchandise, error) {
+	logF := advancedlog.FunctionLog(wR.log)
+
+	wMCs := make([]*scheme.WarehouseMerchandise, 0)
+	result := wR.db.Where("warehouse_id = ?", id).Find(&wMCs)
+	if result.Error != nil {
+		logF.Errorln(result.Error)
+		return nil, result.Error
+	}
+	wMs := make([]*entity.WarehouseMerchandise, 0)
+	for _, wM := range wMCs {
+		wMs = append(wMs, &entity.WarehouseMerchandise{
+			Id:              wM.Id,
+			WarehouseId:     wM.WarehouseId,
+			ProductName:     wM.ProductName,
+			ProductCost:     wM.ProductCost,
+			ManufactureDate: wM.ManufactureDate,
+			ExpireDate:      wM.ExpiryDate,
+			SKU:             wM.SKU,
+			Quantity:        wM.Quantity,
+			Measure:         wM.Measure,
+		})
+	}
+
+	return wMs, nil
+}
+
 func (wR *warehouseRepository) GetAllWarehouseMerchandise(ctx context.Context) ([]*entity.WarehouseMerchandise, error) {
 	logF := advancedlog.FunctionLog(wR.log)
 

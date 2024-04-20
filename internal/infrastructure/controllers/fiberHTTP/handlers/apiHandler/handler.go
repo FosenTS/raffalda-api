@@ -11,14 +11,18 @@ type handlerApi struct {
 	warehousService    service.Warehouse
 	merchandiseParser  service.MerchandiseParser
 	merchandiseService service.MerchandiseService
+	soldPointService   service.SoldPoint
+	transactionService service.Transaction
 	log                *logrus.Entry
 }
 
-func NewHandlerApi(warehouse service.Warehouse, merchandiseParser service.MerchandiseParser, merchandiseService service.MerchandiseService, log *logrus.Entry) fiberHTTP.HandlerFiber {
+func NewHandlerApi(warehouse service.Warehouse, merchandiseParser service.MerchandiseParser, merchandiseService service.MerchandiseService, soldPointService service.SoldPoint, transactionService service.Transaction, log *logrus.Entry) fiberHTTP.HandlerFiber {
 	return &handlerApi{
 		warehousService:    warehouse,
 		merchandiseParser:  merchandiseParser,
 		merchandiseService: merchandiseService,
+		soldPointService:   soldPointService,
+		transactionService: transactionService,
 		log:                log,
 	}
 }

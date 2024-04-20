@@ -14,6 +14,8 @@ type Storage struct {
 	RefreshTokens storage.RefreshToken
 	Merchandise   storage.Merchandise
 	Warehouse     storage.Warehouse
+	SoldPoint     storage.SoldPoint
+	Transaction   storage.Transaction
 }
 
 func NewStorage(db *gorm.DB, log *logrus.Entry) (*Storage, error) {
@@ -42,10 +44,24 @@ func NewStorage(db *gorm.DB, log *logrus.Entry) (*Storage, error) {
 		return nil, err
 	}
 
+	soldPointStorage, err := gormDB.NewGormSoldPointRepository(db, log.WithField("location", "gorm-sold-point-repository"))
+	if err != nil {
+		logF.Errorln(err)
+		return nil, err
+	}
+
+	transactionStorage, err := gormDB.NewGormTransactionRepository(db, log.WithField("location", "gorm-transaction-repository"))
+	if err != nil {
+		logF.Errorln(err)
+		return nil, err
+	}
+
 	return &Storage{
 		User:          userStorage,
 		RefreshTokens: refreshTokenStorage,
 		Merchandise:   merchandiseStorage,
 		Warehouse:     warehouseStorage,
+		SoldPoint:     soldPointStorage,
+		Transaction:   transactionStorage,
 	}, nil
 }
