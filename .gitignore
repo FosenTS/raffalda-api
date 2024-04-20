@@ -1,0 +1,6 @@
+.env*
+.idea/dictionaries/ivankruglov.xml
+./application
+.zed
+.idea
+.DS_Store

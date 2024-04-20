@@ -1,0 +1,41 @@
+version: "3"
+services:
+  postgres-db:
+    image: postgres:16.2
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: test1234
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "15432:5432"
+
+  backend-api:
+    image: backend-api
+    depends_on:
+      - postgres-db
+    build:
+      context: ./
+      dockerfile: deploy.Dockerfile
+    restart: unless-stopped
+    ports:
+      - "17771:7771"
+      - "17779:7779"
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "19090:9090"
+
+  grafana:
+    image: grafana/grafana-oss:10.0.12
+    ports:
+      - "13000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+
+volumes:
+  grafana-data:
+  db_data:

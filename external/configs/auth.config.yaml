@@ -1,0 +1,6 @@
+jwtLiveTimeSeconds: 18000000
+refreshLiveTimeSeconds: 2592000000
+fastAuth:
+  scheme: http
+  url: 127.0.0.1:17771
+  path: /auth/fastLogin
