@@ -1,7 +1,6 @@
 package apihandler
 
 import (
-	"encoding/json"
 	"raffalda-api/internal/domain/entity"
 	"raffalda-api/internal/domain/storage/dto"
 	"raffalda-api/pkg/advancedlog"
@@ -43,13 +42,13 @@ func (h *handlerApi) GeneralAnalyze(ctx *fiber.Ctx) error {
 		return ctx.SendStatus(fiber.StatusInternalServerError)
 	}
 
-	bodyMessage, err := json.Marshal(notifys)
-	if err != nil {
-		logF.Errorln(err)
-		return ctx.SendStatus(fiber.StatusInternalServerError)
-	}
+	//bodyMessage, err := json.Marshal(notifys)
+	//if err != nil {
+	//	logF.Errorln(err)
+	//	return ctx.SendStatus(fiber.StatusInternalServerError)
+	//}
 
-	return ctx.Status(fiber.StatusOK).JSON(bodyMessage)
+	return ctx.Status(fiber.StatusOK).JSON(notifys)
 }
 
 func (h *handlerApi) Test(ctx *fiber.Ctx) error {
@@ -99,13 +98,13 @@ func (h *handlerApi) GetAllSoldPoint(ctx *fiber.Ctx) error {
 		return err
 	}
 
-	bodyMessage, err := json.Marshal(sP)
-	if err != nil {
-		h.log.Errorln(err)
-		return ctx.SendStatus(fiber.StatusInternalServerError)
-	}
+	//bodyMessage, err := json.Marshal(sP)
+	//if err != nil {
+	//	h.log.Errorln(err)
+	//	return ctx.SendStatus(fiber.StatusInternalServerError)
+	//}
 
-	return ctx.Status(fiber.StatusOK).JSON(bodyMessage)
+	return ctx.Status(fiber.StatusOK).JSON(sP)
 }
 
 func (h *handlerApi) GetSoldPointById(ctx *fiber.Ctx) error {
@@ -121,13 +120,13 @@ func (h *handlerApi) GetSoldPointById(ctx *fiber.Ctx) error {
 		return err
 	}
 
-	bodyMessage, err := json.Marshal(sP)
-	if err != nil {
-		h.log.Errorln(err)
-		return ctx.SendStatus(fiber.StatusInternalServerError)
-	}
+	//bodyMessage, err := json.Marshal(sP)
+	//if err != nil {
+	//	h.log.Errorln(err)
+	//	return ctx.SendStatus(fiber.StatusInternalServerError)
+	//}
 
-	return ctx.Status(fiber.StatusOK).JSON(bodyMessage)
+	return ctx.Status(fiber.StatusOK).JSON(sP)
 }
 
 func (h *handlerApi) GetAllMerchandiseMoreInfo(ctx *fiber.Ctx) error {
@@ -138,14 +137,14 @@ func (h *handlerApi) GetAllMerchandiseMoreInfo(ctx *fiber.Ctx) error {
 		h.log.Errorln(err)
 		return err
 	}
+	//
+	//bodyMessage, err := json.Marshal(ms)
+	//if err != nil {
+	//	h.log.Errorln(err)
+	//	return ctx.SendStatus(fiber.StatusInternalServerError)
+	//}
 
-	bodyMessage, err := json.Marshal(ms)
-	if err != nil {
-		h.log.Errorln(err)
-		return ctx.SendStatus(fiber.StatusInternalServerError)
-	}
-
-	return ctx.Status(fiber.StatusOK).JSON(bodyMessage)
+	return ctx.Status(fiber.StatusOK).JSON(ms)
 }
 
 func (h *handlerApi) StoreWarehouseMerchandise(ctx *fiber.Ctx) error {
@@ -212,14 +211,14 @@ func (h *handlerApi) GetAllWarehouse(ctx *fiber.Ctx) error {
 			logF.Errorln(err)
 			return ctx.SendStatus(fiber.StatusInternalServerError)
 		}
+		//
+		//bodyResponse, err := json.Marshal(warehouses)
+		//if err != nil {
+		//	logF.Errorln(err)
+		//	return ctx.SendStatus(fiber.StatusInternalServerError)
+		//}
 
-		bodyResponse, err := json.Marshal(warehouses)
-		if err != nil {
-			logF.Errorln(err)
-			return ctx.SendStatus(fiber.StatusInternalServerError)
-		}
-
-		return ctx.Status(fiber.StatusOK).JSON(bodyResponse)
+		return ctx.Status(fiber.StatusOK).JSON(warehouses)
 	}
 
 	warehouses, err := h.warehousService.GetAll(ctx.Context())
@@ -227,14 +226,14 @@ func (h *handlerApi) GetAllWarehouse(ctx *fiber.Ctx) error {
 		logF.Errorln(err)
 		return ctx.SendStatus(fiber.StatusInternalServerError)
 	}
+	//
+	//bodyResponse, err := json.Marshal(warehouses)
+	//if err != nil {
+	//	logF.Errorln(err)
+	//	return ctx.SendStatus(fiber.StatusInternalServerError)
+	//}
 
-	bodyResponse, err := json.Marshal(warehouses)
-	if err != nil {
-		logF.Errorln(err)
-		return ctx.SendStatus(fiber.StatusInternalServerError)
-	}
-
-	return ctx.Status(fiber.StatusOK).JSON(bodyResponse)
+	return ctx.Status(fiber.StatusOK).JSON(warehouses)
 }
 
 func (h *handlerApi) UpdateWarehouse(ctx *fiber.Ctx) error {
@@ -270,14 +269,14 @@ func (h *handlerApi) GetWarehouseById(ctx *fiber.Ctx) error {
 		logF.Errorln(err)
 		return ctx.SendStatus(fiber.StatusInternalServerError)
 	}
+	//
+	//bodyResponce, err := json.Marshal(warehouse)
+	//if err != nil {
+	//	logF.Errorln(err)
+	//	return ctx.SendStatus(fiber.StatusInternalServerError)
+	//}
 
-	bodyResponce, err := json.Marshal(warehouse)
-	if err != nil {
-		logF.Errorln(err)
-		return ctx.SendStatus(fiber.StatusInternalServerError)
-	}
-
-	return ctx.Status(fiber.StatusOK).JSON(bodyResponce)
+	return ctx.Status(fiber.StatusOK).JSON(warehouse)
 }
 
 func (h *handlerApi) StoreTransaction(ctx *fiber.Ctx) error {
@@ -329,14 +328,14 @@ func (h *handlerApi) GetTransactionBy(ctx *fiber.Ctx) error {
 			}
 		}
 	}
+	//
+	//bodyResponse, err := json.Marshal(transaction)
+	//if err != nil {
+	//	logF.Errorln(err)
+	//	return ctx.SendStatus(fiber.StatusInternalServerError)
+	//}
 
-	bodyResponse, err := json.Marshal(transaction)
-	if err != nil {
-		logF.Errorln(err)
-		return ctx.SendStatus(fiber.StatusInternalServerError)
-	}
-
-	return ctx.Status(fiber.StatusOK).JSON(bodyResponse)
+	return ctx.Status(fiber.StatusOK).JSON(transaction)
 }
 
 func (h *handlerApi) GetAllTransaction(ctx *fiber.Ctx) error {
@@ -347,13 +346,13 @@ func (h *handlerApi) GetAllTransaction(ctx *fiber.Ctx) error {
 		return ctx.SendStatus(fiber.StatusInternalServerError)
 	}
 
-	bodyResponse, err := json.Marshal(transactions)
-	if err != nil {
-		logF.Errorln(err)
-		return ctx.SendStatus(fiber.StatusInternalServerError)
-	}
+	//bodyResponse, err := json.Marshal(transactions)
+	//if err != nil {
+	//	logF.Errorln(err)
+	//	return ctx.SendStatus(fiber.StatusInternalServerError)
+	//}
 
-	return ctx.Status(fiber.StatusOK).JSON(bodyResponse)
+	return ctx.Status(fiber.StatusOK).JSON(transactions)
 }
 
 func (h *handlerApi) DeleteTransaction(ctx *fiber.Ctx) error {
