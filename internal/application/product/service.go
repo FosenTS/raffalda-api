@@ -16,6 +16,7 @@ type Services struct {
 	WarehouseService   service.Warehouse
 	SoldPoint          service.SoldPoint
 	Transaction        service.Transaction
+	MarksService       service.Marks
 	AnalyzeService     service.Analyze
 }
 
@@ -40,6 +41,8 @@ func NewServices(
 
 	transaction := service.NewTransaction(storage.Transaction, storage.Warehouse, storage.SoldPoint, log.WithField("location", "transaction-service"))
 
+	marksService := service.NewMarks(storage.SoldPoint, storage.Warehouse, storage.Marks, log.WithField("location", "marks-service"))
+
 	analyzeService := service.NewAnalyze(storage.Warehouse, storage.Merchandise, storage.SoldPoint, storage.Transaction, log.WithField("location", "analyze-service"))
 
 	return &Services{
@@ -49,6 +52,7 @@ func NewServices(
 		WarehouseService:   warehouse,
 		SoldPoint:          soldPoint,
 		Transaction:        transaction,
+		MarksService:       marksService,
 		AnalyzeService:     analyzeService,
 	}
 }

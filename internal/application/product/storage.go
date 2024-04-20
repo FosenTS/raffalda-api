@@ -16,6 +16,7 @@ type Storage struct {
 	Warehouse     storage.Warehouse
 	SoldPoint     storage.SoldPoint
 	Transaction   storage.Transaction
+	Marks         storage.Marks
 }
 
 func NewStorage(db *gorm.DB, log *logrus.Entry) (*Storage, error) {
