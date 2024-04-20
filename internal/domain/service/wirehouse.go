@@ -92,19 +92,20 @@ func (wH *warehouse) GetAllMerchandiseMoreInfo(ctx context.Context, num uint) ([
 			logF.Errorln(err)
 			return nil, err
 		}
-		expireDays := int(manufactureDate.Sub(expireDate).Hours() / 24)
+		expireDays := manufactureDate.Sub(expireDate).Hours() / 24
+		expirePercentage := manufactureDate.Sub(time.Now()).Hours() / 24 / expireDays * 100
 
 		mmi = append(mmi, &entity.MerchandiseMoreInfo{
-			Id:              m.Id,
-			WarehouseId:     m.WarehouseId,
-			ProductName:     m.ProductName,
-			ProductCost:     m.ProductCost,
-			ManufactureDate: m.ManufactureDate,
-			ExpiryDate:      m.ExpireDate,
-			SKU:             m.SKU,
-			Quantity:        m.Quantity,
-			Measure:         m.Measure,
-			ExpireProcent:   uint(expireDays),
+			Id:               m.Id,
+			WarehouseId:      m.WarehouseId,
+			ProductName:      m.ProductName,
+			ProductCost:      m.ProductCost,
+			ManufactureDate:  m.ManufactureDate,
+			ExpiryDate:       m.ExpireDate,
+			SKU:              m.SKU,
+			Quantity:         m.Quantity,
+			Measure:          m.Measure,
+			ExpirePercentage: uint(expirePercentage),
 		})
 	}
 

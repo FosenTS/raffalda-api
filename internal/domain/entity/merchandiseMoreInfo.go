@@ -11,5 +11,5 @@ type MerchandiseMoreInfo struct {
 	Quantity        uint
 	Measure         string
 
-	ExpireProcent uint
+	ExpirePercentage uint
 }
