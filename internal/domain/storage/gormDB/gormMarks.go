@@ -32,7 +32,7 @@ func NewMarksRepository(db *gorm.DB, log *logrus.Entry) (MarksRepository, error)
 func (mR *marksRepository) InsertMark(ctx context.Context, m *dto.MarkCreate) error {
 	logF := advancedlog.FunctionLog(mR.log)
 
-	result := mR.db.Create(scheme.Mark{
+	result := mR.db.Create(&scheme.Mark{
 		Type:      m.Type,
 		ObjectId:  m.ObjectId,
 		Latitude:  m.Latitude,
