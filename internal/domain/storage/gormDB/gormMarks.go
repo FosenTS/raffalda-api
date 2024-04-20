@@ -54,6 +54,7 @@ func (mR *marksRepository) GetMarkByObjectId(ctx context.Context, id uint) (*ent
 		return nil, result.Error
 	}
 	return &entity.Mark{
+		Id:        m.Id,
 		Type:      m.Type,
 		ObjectId:  m.ObjectId,
 		Latitude:  m.Latitude,
@@ -70,6 +71,7 @@ func (mR *marksRepository) GetMarkById(ctx context.Context, id uint) (*entity.Ma
 		return nil, result.Error
 	}
 	return &entity.Mark{
+		Id:        m.Id,
 		Type:      m.Type,
 		ObjectId:  m.ObjectId,
 		Latitude:  m.Latitude,
@@ -86,6 +88,7 @@ func (mR *marksRepository) GetMarkByObjectIdAndType(ctx context.Context, id uint
 		return nil, result.Error
 	}
 	return &entity.Mark{
+		Id:        m.Id,
 		Type:      m.Type,
 		ObjectId:  m.ObjectId,
 		Latitude:  m.Latitude,
@@ -114,6 +117,7 @@ func (mR *marksRepository) GetAllMarks(ctx context.Context) ([]*entity.Mark, err
 	marks := make([]*entity.Mark, 0)
 	for _, mark := range m {
 		marks = append(marks, &entity.Mark{
+			Id:        mark.Id,
 			Type:      mark.Type,
 			ObjectId:  mark.ObjectId,
 			Latitude:  mark.Latitude,
