@@ -19,6 +19,7 @@ func (h *handlerApi) RegisterGroup(g fiber.Router) {
 	g.Post("/updateWarehouse", h.UpdateWarehouse)
 	g.Get("/getWarehouseById", h.GetWarehouseById)
 	g.Post("/storeWarehouse", h.StoreWarehouse)
+	g.Delete("/deleteWarehouse", h.DeleteWarehouse)
 	g.Get("/getExpireStats", h.GetExpireStats)
 
 	g.Post("/storeWarehouseMerchandise", h.StoreWarehouseMerchandise)
@@ -199,6 +200,22 @@ func (h *handlerApi) StoreWarehouse(ctx *fiber.Ctx) error {
 		return ctx.SendStatus(fiber.StatusInternalServerError)
 	}
 
+	return ctx.SendStatus(fiber.StatusOK)
+}
+
+func (h *handlerApi) DeleteWarehouse(ctx *fiber.Ctx) error {
+	logF := advancedlog.FunctionLog(h.log)
+	idC := ctx.Query("id")
+	id, err := strconv.Atoi(idC)
+	if err != nil {
+		logF.Errorln(err)
+		return ctx.SendStatus(fiber.StatusBadRequest)
+	}
+	err = h.warehousService.DeleteWarehouse(ctx.Context(), uint(id))
+	if err != nil {
+		logF.Errorln(err)
+		return ctx.SendStatus(fiber.StatusInternalServerError)
+	}
 	return ctx.SendStatus(fiber.StatusOK)
 }
 

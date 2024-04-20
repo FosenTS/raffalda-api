@@ -21,6 +21,7 @@ var (
 
 type Warehouse interface {
 	StoreNewWarehouse(ctx context.Context, wC *dto.WarehouseCreate) error
+	DeleteWarehouse(ctx context.Context, id uint) error
 	UpdateWarehouse(ctx context.Context, w *dto.Warehouse) error
 	GetAll(ctx context.Context) ([]*entity.Warehouse, error)
 	GetById(ctx context.Context, id uint) (*entity.Warehouse, error)
@@ -58,6 +59,16 @@ func (wH *warehouse) StoreNewWarehouse(ctx context.Context, wC *dto.WarehouseCre
 		return nil
 	}
 
+	return nil
+}
+
+func (wH *warehouse) DeleteWarehouse(ctx context.Context, id uint) error {
+	logF := advancedlog.FunctionLog(wH.log)
+	err := wH.warehouseStorage.DeleteWarehouse(ctx, id)
+	if err != nil {
+		logF.Errorln(err)
+		return err
+	}
 	return nil
 }
 
