@@ -24,6 +24,8 @@ type Warehouse interface {
 	UpdateWarehouse(ctx context.Context, w *dto.Warehouse) error
 	GetAll(ctx context.Context) ([]*entity.Warehouse, error)
 	GetById(ctx context.Context, id uint) (*entity.Warehouse, error)
+	GetAllExpireStats(ctx context.Context) (*entity.WarehouseStatistic, error)
+	GetExpireStatsByWarehouseId(ctx context.Context, id uint) (*entity.WarehouseStatistic, error)
 
 	StoreWarehouseMerchandise(ctx context.Context, wM *dto.WarehouseMerchandiseCreate) error
 	UpdateWarehouseMerchandise(ctx context.Context, wM *dto.WarehouseMerchandise) error
@@ -86,6 +88,86 @@ func (wH *warehouse) GetAll(ctx context.Context) ([]*entity.Warehouse, error) {
 }
 
 const paginationStep uint = 20
+
+func (wH *warehouse) GetAllExpireStats(ctx context.Context) (*entity.WarehouseStatistic, error) {
+	logF := advancedlog.FunctionLog(wH.log)
+
+	var DangerToSold, RecommendationToSold, NormalToSold uint = 0, 0, 0
+	wM, err := wH.warehouseStorage.GetAllWarehouseMerchandise(ctx)
+	if err != nil {
+		logF.Errorln(err)
+		return nil, err
+	}
+
+	for _, m := range wM {
+		manufactureDate, err := time.Parse("2006-01-02 15:04:05", m.ManufactureDate)
+		if err != nil {
+			logF.Errorln(err)
+			return nil, err
+		}
+		expireDate, err := time.Parse("2006-01-02 15:04:05", m.ExpireDate)
+		if err != nil {
+			logF.Errorln(err)
+			return nil, err
+		}
+
+		expireDays := manufactureDate.Sub(expireDate).Hours() / 24
+		expirePercentage := manufactureDate.Sub(time.Now()).Hours() / 24 / expireDays * 100
+		if expirePercentage < 10 {
+			DangerToSold++
+		} else if expirePercentage < 30 {
+			RecommendationToSold++
+
+		}
+		NormalToSold++
+	}
+
+	return &entity.WarehouseStatistic{
+		DangerToSold:         DangerToSold,
+		RecommendationToSold: RecommendationToSold,
+		NormalToSold:         NormalToSold,
+	}, nil
+}
+
+func (wH *warehouse) GetExpireStatsByWarehouseId(ctx context.Context, id uint) (*entity.WarehouseStatistic, error) {
+	logF := advancedlog.FunctionLog(wH.log)
+
+	var DangerToSold, RecommendationToSold, NormalToSold uint = 0, 0, 0
+	wM, err := wH.warehouseStorage.GetWarehouseMerchandiseByWarehouseId(ctx, id)
+	if err != nil {
+		logF.Errorln(err)
+		return nil, err
+	}
+
+	for _, m := range wM {
+		manufactureDate, err := time.Parse("2006-01-02 15:04:05", m.ManufactureDate)
+		if err != nil {
+			logF.Errorln(err)
+			return nil, err
+		}
+		expireDate, err := time.Parse("2006-01-02 15:04:05", m.ExpireDate)
+		if err != nil {
+			logF.Errorln(err)
+			return nil, err
+		}
+
+		expireDays := manufactureDate.Sub(expireDate).Hours() / 24
+		expirePercentage := manufactureDate.Sub(time.Now()).Hours() / 24 / expireDays * 100
+		if expirePercentage < 10 {
+			DangerToSold++
+		} else if expirePercentage < 30 {
+			RecommendationToSold++
+
+		}
+		NormalToSold++
+	}
+
+	return &entity.WarehouseStatistic{
+		DangerToSold:         DangerToSold,
+		RecommendationToSold: RecommendationToSold,
+		NormalToSold:         NormalToSold,
+	}, nil
+}
 
 func (wH *warehouse) GetAllMerchandiseMoreInfo(ctx context.Context, num uint) ([]*entity.MerchandiseMoreInfo, error) {
 	logF := advancedlog.FunctionLog(wH.log)

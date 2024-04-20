@@ -236,6 +236,33 @@ func (h *handlerApi) GetAllWarehouse(ctx *fiber.Ctx) error {
 	return ctx.Status(fiber.StatusOK).JSON(warehouses)
 }
 
+func (h *handlerApi) GetExpireStats(ctx *fiber.Ctx) error {
+	logF := advancedlog.FunctionLog(h.log)
+
+	queries := ctx.Queries()
+
+	var stats *entity.WarehouseStatistic
+	if q, ok := queries["id"]; ok {
+		id, err := strconv.Atoi(q)
+		if err != nil {
+			logF.Errorln(err)
+			return ctx.SendStatus(fiber.StatusBadRequest)
+		}
+		stats, err = h.warehousService.GetExpireStatsByWarehouseId(ctx.Context(), uint(id))
+		if err != nil {
+			logF.Errorln(err)
+			return ctx.SendStatus(fiber.StatusInternalServerError)
+		}
+	}
+	stats, err := h.warehousService.GetAllExpireStats(ctx.Context())
+	if err != nil {
+		logF.Errorln(err)
+		return ctx.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(stats)
+}
+
 func (h *handlerApi) UpdateWarehouse(ctx *fiber.Ctx) error {
 	logF := advancedlog.FunctionLog(h.log)
 
