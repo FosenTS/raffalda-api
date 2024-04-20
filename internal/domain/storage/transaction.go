@@ -11,7 +11,8 @@ type Transaction interface {
 	GetAllTransactions(ctx context.Context) ([]*entity.Transaction, error)
 	DeleteTransaction(ctx context.Context, id uint) error
 	GetTransactionById(ctx context.Context, id uint) (*entity.Transaction, error)
-	GetTransactionByWarehausId(ctx context.Context, id uint) (*entity.Transaction, error)
+	GetTransactionByWarehousesId(ctx context.Context, id uint) (*entity.Transaction, error)
+	GetTransactionsByWarehousesId(ctx context.Context, id uint) ([]*entity.Transaction, error)
 	GetTransactionBySoldPointId(ctx context.Context, id uint) (*entity.Transaction, error)
 	GetTransactionByMerchandiseId(ctx context.Context, id uint) (*entity.Transaction, error)
 }

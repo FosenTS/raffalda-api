@@ -5,5 +5,6 @@ type Transaction struct {
 	WarehausId    uint
 	SoldPointId   uint
 	MerchandiseId uint
+	Date          string
 	Count         uint
 }

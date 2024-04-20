@@ -34,6 +34,7 @@ func (h *handlerApi) RegisterGroup(g fiber.Router) {
 	g.Post("/storeTransaction", h.StoreTransaction)
 	g.Get("/getAllTransactions", h.GetAllTransaction)
 	g.Get("/getTransactionBy", h.GetTransactionBy)
+	g.Get("/getTransactionStatsByWarehouseId", h.GetTransactionStatsByWarehouseId)
 }
 
 func (h *handlerApi) GeneralAnalyze(ctx *fiber.Ctx) error {
@@ -375,6 +376,25 @@ func (h *handlerApi) GetTransactionBy(ctx *fiber.Ctx) error {
 	//}
 
 	return ctx.Status(fiber.StatusOK).JSON(transaction)
+}
+
+func (h *handlerApi) GetTransactionStatsByWarehouseId(ctx *fiber.Ctx) error {
+	logF := advancedlog.FunctionLog(h.log)
+
+	idC := ctx.Query("id")
+	id, err := strconv.Atoi(idC)
+	if err != nil {
+		logF.Errorln(err)
+		return ctx.SendStatus(fiber.StatusBadRequest)
+	}
+
+	stats, err := h.transactionService.GetTransactionsStatsByWarehousesId(ctx.Context(), uint(id))
+	if err != nil {
+		logF.Errorln(err)
+		return ctx.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(stats)
 }
 
 func (h *handlerApi) GetAllTransaction(ctx *fiber.Ctx) error {

@@ -39,6 +39,7 @@ func (g *gormTransactionRepository) InsertTransaction(ctx context.Context, trans
 		WarehausId:    transaction.WarehousesId,
 		SoldPointId:   transaction.SoldPointId,
 		MerchandiseId: transaction.MerchandiseId,
+		Date:          transaction.Date,
 		Count:         transaction.Count,
 	}).Error
 	if err != nil {
@@ -63,6 +64,7 @@ func (g *gormTransactionRepository) GetAllTransactions(ctx context.Context) ([]*
 			WarehouseId:   transaction.WarehausId,
 			SoldPointId:   transaction.SoldPointId,
 			MerchandiseId: transaction.MerchandiseId,
+			Date:          transaction.Date,
 			Count:         transaction.Count,
 		})
 	}
@@ -92,11 +94,12 @@ func (g *gormTransactionRepository) GetTransactionById(ctx context.Context, id u
 		WarehouseId:   transaction.WarehausId,
 		SoldPointId:   transaction.SoldPointId,
 		MerchandiseId: transaction.MerchandiseId,
+		Date:          transaction.Date,
 		Count:         transaction.Count,
 	}, nil
 }
 
-func (g *gormTransactionRepository) GetTransactionByWarehausId(ctx context.Context, id uint) (*entity.Transaction, error) {
+func (g *gormTransactionRepository) GetTransactionByWarehousesId(ctx context.Context, id uint) (*entity.Transaction, error) {
 	logF := advancedlog.FunctionLog(g.log)
 	transaction := new(scheme.Transaction)
 	result := g.db.Where("warehaus_id = ?", id).First(&transaction)
@@ -109,8 +112,31 @@ func (g *gormTransactionRepository) GetTransactionByWarehausId(ctx context.Conte
 		WarehouseId:   transaction.WarehausId,
 		SoldPointId:   transaction.SoldPointId,
 		MerchandiseId: transaction.MerchandiseId,
+		Date:          transaction.Date,
 		Count:         transaction.Count,
 	}, nil
+}
+
+func (g *gormTransactionRepository) GetTransactionsByWarehousesId(ctx context.Context, id uint) ([]*entity.Transaction, error) {
+	logF := advancedlog.FunctionLog(g.log)
+	transactions := make([]*scheme.Transaction, 0)
+	result := g.db.Where("warehaus_id = ?", id).Find(&transactions)
+	if result.Error != nil {
+		logF.Errorln(result.Error)
+		return nil, result.Error
+	}
+	ts := make([]*entity.Transaction, 0)
+	for _, transaction := range transactions {
+		ts = append(ts, &entity.Transaction{
+			Id:            transaction.Id,
+			WarehouseId:   transaction.WarehausId,
+			SoldPointId:   transaction.SoldPointId,
+			MerchandiseId: transaction.MerchandiseId,
+			Date:          transaction.Date,
+			Count:         transaction.Count,
+		})
+	}
+	return nil, nil
 }
 
 func (g *gormTransactionRepository) GetTransactionBySoldPointId(ctx context.Context, id uint) (*entity.Transaction, error) {
@@ -126,6 +152,7 @@ func (g *gormTransactionRepository) GetTransactionBySoldPointId(ctx context.Cont
 		WarehouseId:   transaction.WarehausId,
 		SoldPointId:   transaction.SoldPointId,
 		MerchandiseId: transaction.MerchandiseId,
+		Date:          transaction.Date,
 		Count:         transaction.Count,
 	}, nil
 }
@@ -143,6 +170,7 @@ func (g *gormTransactionRepository) GetTransactionByMerchandiseId(ctx context.Co
 		WarehouseId:   transaction.WarehausId,
 		SoldPointId:   transaction.SoldPointId,
 		MerchandiseId: transaction.MerchandiseId,
+		Date:          transaction.Date,
 		Count:         transaction.Count,
 	}, nil
 }

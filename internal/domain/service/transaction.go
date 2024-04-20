@@ -7,6 +7,7 @@ import (
 	"raffalda-api/internal/domain/storage"
 	"raffalda-api/internal/domain/storage/dto"
 	"raffalda-api/pkg/advancedlog"
+	"time"
 )
 
 type Transaction interface {
@@ -15,8 +16,11 @@ type Transaction interface {
 	DeleteTransaction(ctx context.Context, id uint) error
 	GetTransactionById(ctx context.Context, id uint) (*entity.TransactionInfo, error)
 	GetTransactionByWarehousesId(ctx context.Context, id uint) (*entity.TransactionInfo, error)
+	GetTransactionsByWarehousesId(ctx context.Context, id uint) ([]*entity.TransactionInfo, error)
 	GetTransactionBySoldPointId(ctx context.Context, id uint) (*entity.TransactionInfo, error)
 	GetTransactionByMerchandiseId(ctx context.Context, id uint) (*entity.TransactionInfo, error)
+
+	GetTransactionsStatsByWarehousesId(ctx context.Context, id uint) (*entity.TransactionStats, error)
 }
 
 type transaction struct {
@@ -121,6 +125,7 @@ func (t *transaction) GetAllTransactions(ctx context.Context) ([]*entity.Transac
 			WarehausId:       transaction.WarehouseId,
 			SoldPointId:      transaction.SoldPointId,
 			MerchandiseId:    transaction.MerchandiseId,
+			Date:             transaction.Date,
 			Count:            transaction.Count,
 			WarehouseName:    warehouse.Name,
 			SoldPointRegion:  soldPoint.Region,
@@ -174,6 +179,7 @@ func (t *transaction) GetTransactionById(ctx context.Context, id uint) (*entity.
 		WarehausId:       transaction.WarehouseId,
 		SoldPointId:      transaction.SoldPointId,
 		MerchandiseId:    transaction.MerchandiseId,
+		Date:             transaction.Date,
 		Count:            transaction.Count,
 		WarehouseName:    warehouse.Name,
 		SoldPointRegion:  soldPoint.Region,
@@ -189,8 +195,90 @@ func (t *transaction) GetTransactionById(ctx context.Context, id uint) (*entity.
 	}, nil
 }
 
+func (t *transaction) GetTransactionsByWarehousesId(ctx context.Context, id uint) ([]*entity.TransactionInfo, error) {
+	transactions, err := t.transactionStorage.GetTransactionsByWarehousesId(ctx, id)
+	if err != nil {
+		t.log.Errorln(err)
+		return nil, err
+	}
+	transactionsInfo := make([]*entity.TransactionInfo, 0)
+	for _, transaction := range transactions {
+		warehouse, err := t.warehouseStorage.GetWarehouseById(ctx, transaction.WarehouseId)
+		if err != nil {
+			t.log.Errorln(err)
+			return nil, err
+		}
+		soldPoint, err := t.soldPointStorage.GetSoldPointById(ctx, transaction.SoldPointId)
+		if err != nil {
+			t.log.Errorln(err)
+			return nil, err
+		}
+		warehouseMerchandises, err := t.warehouseStorage.GetWarehouseMerchandiseById(ctx, transaction.WarehouseId)
+		if err != nil {
+			t.log.Errorln(err)
+			return nil, err
+		}
+
+		transactionsInfo = append(transactionsInfo, &entity.TransactionInfo{
+			Id:               transaction.Id,
+			WarehausId:       transaction.WarehouseId,
+			SoldPointId:      transaction.SoldPointId,
+			MerchandiseId:    transaction.MerchandiseId,
+			Date:             transaction.Date,
+			Count:            transaction.Count,
+			WarehouseName:    warehouse.Name,
+			SoldPointRegion:  soldPoint.Region,
+			SoldPointName:    soldPoint.Name,
+			SoldPointAddress: soldPoint.Address,
+			ProductName:      warehouseMerchandises.ProductName,
+			ProductCost:      warehouseMerchandises.ProductCost,
+			ManufactureDate:  warehouseMerchandises.ManufactureDate,
+			ExpireDate:       warehouseMerchandises.ExpireDate,
+			SKU:              warehouseMerchandises.SKU,
+			Quantity:         warehouseMerchandises.Quantity,
+			Measure:          warehouseMerchandises.Measure,
+		})
+	}
+
+	return transactionsInfo, nil
+}
+
+func (t *transaction) GetTransactionsStatsByWarehousesId(ctx context.Context, id uint) (*entity.TransactionStats, error) {
+	transactions, err := t.GetTransactionsByWarehousesId(ctx, id)
+	if err != nil {
+		t.log.Errorln(err)
+		return nil, err
+	}
+	var transactionStats = new(entity.TransactionStats)
+	for _, tc := range transactions {
+		date, err := time.Parse("2006-01-02 15:01:05", tc.Date)
+		if err != nil {
+			t.log.Errorln(err)
+			return nil, err
+		}
+		switch date.Weekday() {
+		case time.Monday:
+			transactionStats.Monday++
+		case time.Tuesday:
+			transactionStats.Tuesday++
+		case time.Wednesday:
+			transactionStats.Wednesday++
+		case time.Thursday:
+			transactionStats.Thursday++
+		case time.Friday:
+			transactionStats.Friday++
+		case time.Saturday:
+			transactionStats.Saturday++
+		case time.Sunday:
+			transactionStats.Sunday++
+		}
+	}
+
+	return transactionStats, nil
+}
+
 func (t *transaction) GetTransactionByWarehousesId(ctx context.Context, id uint) (*entity.TransactionInfo, error) {
-	transaction, err := t.transactionStorage.GetTransactionByWarehausId(ctx, id)
+	transaction, err := t.transactionStorage.GetTransactionByWarehousesId(ctx, id)
 	if err != nil {
 		t.log.Errorln(err)
 		return nil, err
@@ -215,6 +303,7 @@ func (t *transaction) GetTransactionByWarehousesId(ctx context.Context, id uint)
 		WarehausId:       transaction.WarehouseId,
 		SoldPointId:      transaction.SoldPointId,
 		MerchandiseId:    transaction.MerchandiseId,
+		Date:             transaction.Date,
 		Count:            transaction.Count,
 		WarehouseName:    warehouse.Name,
 		SoldPointRegion:  soldPoint.Region,
@@ -256,6 +345,7 @@ func (t *transaction) GetTransactionBySoldPointId(ctx context.Context, id uint) 
 		WarehausId:       transaction.WarehouseId,
 		SoldPointId:      transaction.SoldPointId,
 		MerchandiseId:    transaction.MerchandiseId,
+		Date:             transaction.Date,
 		Count:            transaction.Count,
 		WarehouseName:    warehouse.Name,
 		SoldPointRegion:  soldPoint.Region,
@@ -298,6 +388,7 @@ func (t *transaction) GetTransactionByMerchandiseId(ctx context.Context, id uint
 		WarehausId:       transaction.WarehouseId,
 		SoldPointId:      transaction.SoldPointId,
 		MerchandiseId:    transaction.MerchandiseId,
+		Date:             transaction.Date,
 		Count:            transaction.Count,
 		WarehouseName:    warehouse.Name,
 		SoldPointRegion:  soldPoint.Region,
