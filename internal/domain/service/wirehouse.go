@@ -31,7 +31,7 @@ type Warehouse interface {
 	StoreWarehouseMerchandise(ctx context.Context, wM *dto.WarehouseMerchandiseCreate) error
 	UpdateWarehouseMerchandise(ctx context.Context, wM *dto.WarehouseMerchandise) error
 	GetAllAndMoreInfo(ctx context.Context) ([]*entity.WarehouseMoreInfo, error)
-	GetWarehouseMerchandiseByWarehouseId(ctx context.Context, id uint) ([]*entity.WarehouseMerchandise, error)
+	GetWarehouseMerchandiseByWarehouseId(ctx context.Context, id uint) ([]*entity.MerchandiseMoreInfo, error)
 
 	GetAllMerchandiseMoreInfo(ctx context.Context, num uint) ([]*entity.MerchandiseMoreInfo, error)
 }
@@ -352,14 +352,44 @@ func (wH *warehouse) GetWarehouseMerchandiseById(ctx context.Context, id uint) (
 	return wm, nil
 }
 
-func (wH *warehouse) GetWarehouseMerchandiseByWarehouseId(ctx context.Context, id uint) ([]*entity.WarehouseMerchandise, error) {
+func (wH *warehouse) GetWarehouseMerchandiseByWarehouseId(ctx context.Context, id uint) ([]*entity.MerchandiseMoreInfo, error) {
 	logF := advancedlog.FunctionLog(wH.log)
 	wms, err := wH.warehouseStorage.GetWarehouseMerchandiseByWarehouseId(ctx, id)
 	if err != nil {
 		logF.Errorln(err)
 		return nil, err
 	}
-	return wms, nil
+	mmis := make([]*entity.MerchandiseMoreInfo, 0)
+	for _, wm := range wms {
+		manufactureDate, err := time.Parse("2006-01-02 15:04:05", wm.ManufactureDate)
+		if err != nil {
+			logF.Errorln(err)
+			return nil, err
+		}
+		expireDate, err := time.Parse("2006-01-02 15:04:05", wm.ExpireDate)
+		if err != nil {
+			logF.Errorln(err)
+			return nil, err
+		}
+		expireDays := manufactureDate.Sub(expireDate).Hours() / 24
+		expirePercentage := manufactureDate.Sub(time.Now()).Hours() / 24 / expireDays * 100
+
+		mmis = append(mmis, &entity.MerchandiseMoreInfo{
+			Id:               wm.Id,
+			WarehouseId:      wm.WarehouseId,
+			WarehouseName:    wm.WarehouseName,
+			ProductName:      wm.ProductName,
+			ProductCost:      wm.ProductCost,
+			ManufactureDate:  wm.ManufactureDate,
+			ExpiryDate:       wm.ExpireDate,
+			SKU:              wm.SKU,
+			Quantity:         wm.Quantity,
+			Measure:          wm.Measure,
+			ExpirePercentage: uint(expirePercentage),
+		})
+	}
+
+	return mmis, nil
 }
 
 func (wH *warehouse) DeleteWarehouseMerchandise(ctx context.Context, id uint) error {
