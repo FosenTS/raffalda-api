@@ -19,6 +19,7 @@ func (h *handlerApi) RegisterGroup(g fiber.Router) {
 	g.Post("/updateWarehouse", h.UpdateWarehouse)
 	g.Get("/getWarehouseById", h.GetWarehouseById)
 	g.Post("/storeWarehouse", h.StoreWarehouse)
+	g.Get("/getExpireStats", h.GetExpireStats)
 
 	g.Post("/storeWarehouseMerchandise", h.StoreWarehouseMerchandise)
 	g.Post("/updateWarehouseMerchandise", h.UpdateWarehouseMerchandise)
