@@ -7,6 +7,11 @@ import (
 	"raffalda-api/internal/domain/storage"
 )
 
+const (
+	enStorageLess20 = "There's less than 20% space left in the vault"
+	ruStorageLess20 = "В хранилище осталось меньше 20% места"
+)
+
 type Analyze interface {
 	GeneralWarehouseAnalyze(ctx context.Context) ([]*entity.GeneralWarehouseNotify, error)
 }
@@ -39,7 +44,7 @@ func (s *analyze) GeneralWarehouseAnalyze(ctx context.Context) ([]*entity.Genera
 		if precentile < 20 {
 			notifys = append(notifys, &entity.GeneralWarehouseNotify{
 				WarehouseName: w.Name,
-				ProblemInfo:   "Storage is less than 20%",
+				ProblemInfo:   ruStorageLess20,
 			})
 		}
 	}
