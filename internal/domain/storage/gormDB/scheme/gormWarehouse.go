@@ -16,5 +16,5 @@ type WarehouseMerchandise struct {
 	ExpiryDate      string
 	SKU             int
 	Quantity        uint
-	Measure         string
+	Measure         string `gorm:"type:varchar(10)"`
 }
