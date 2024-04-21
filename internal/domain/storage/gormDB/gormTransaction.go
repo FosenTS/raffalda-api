@@ -68,7 +68,7 @@ func (g *gormTransactionRepository) GetAllTransactions(ctx context.Context) ([]*
 			Count:         transaction.Count,
 		})
 	}
-	return nil, nil
+	return ts, nil
 }
 
 func (g *gormTransactionRepository) DeleteTransaction(ctx context.Context, id uint) error {
