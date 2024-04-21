@@ -36,7 +36,7 @@ func NewGormTransactionRepository(db *gorm.DB, log *logrus.Entry) (storage.Trans
 func (g *gormTransactionRepository) InsertTransaction(ctx context.Context, transaction *dto.TransactionCreate) error {
 
 	err := g.db.Create(&scheme.Transaction{
-		WarehausId:    transaction.WarehousesId,
+		WarehausId:    transaction.WarehouseId,
 		SoldPointId:   transaction.SoldPointId,
 		MerchandiseId: transaction.MerchandiseId,
 		Date:          transaction.Date,
