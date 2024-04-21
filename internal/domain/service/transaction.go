@@ -251,7 +251,7 @@ func (t *transaction) GetTransactionsStatsByWarehousesId(ctx context.Context, id
 	}
 	var transactionStats = new(entity.TransactionStats)
 	for _, tc := range transactions {
-		date, err := time.Parse("2006-01-02 15:01:05", tc.Date)
+		date, err := time.Parse("2006-01-02 15:04:05", tc.Date)
 		if err != nil {
 			t.log.Errorln(err)
 			return nil, err
