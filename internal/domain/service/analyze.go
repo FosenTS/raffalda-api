@@ -41,7 +41,7 @@ func (s *analyze) GeneralWarehouseAnalyze(ctx context.Context) ([]*entity.Genera
 	notifys := make([]*entity.GeneralWarehouseNotify, 0)
 	for _, w := range ws {
 		precentile := w.Volume / w.Capacity * 100
-		if precentile < 20 {
+		if precentile > 80 {
 			notifys = append(notifys, &entity.GeneralWarehouseNotify{
 				WarehouseName: w.Name,
 				ProblemInfo:   ruStorageLess20,
