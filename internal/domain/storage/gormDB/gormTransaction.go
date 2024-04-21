@@ -136,7 +136,7 @@ func (g *gormTransactionRepository) GetTransactionsByWarehousesId(ctx context.Co
 			Count:         transaction.Count,
 		})
 	}
-	return nil, nil
+	return ts, nil
 }
 
 func (g *gormTransactionRepository) GetTransactionBySoldPointId(ctx context.Context, id uint) (*entity.Transaction, error) {
