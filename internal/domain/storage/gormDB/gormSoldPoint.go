@@ -50,7 +50,7 @@ func (sR *gormSoldPointRepository) InsertSoldPoint(ctx context.Context, sP *dto.
 func (sR *gormSoldPointRepository) GetAllSoldPoints(ctx context.Context) ([]*entity.SoldPoint, error) {
 	logF := advancedlog.FunctionLog(sR.log)
 	soldPoints := make([]*scheme.SoldPoint, 0)
-	result := sR.db.Find(soldPoints)
+	result := sR.db.Find(&soldPoints)
 	if result.Error != nil {
 		logF.Errorln(result.Error)
 		return nil, nil
