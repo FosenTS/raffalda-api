@@ -1,7 +1,7 @@
 package dto
 
 type TransactionCreate struct {
-	WarehousesId  uint
+	WarehouseId   uint
 	SoldPointId   uint
 	MerchandiseId uint
 	Date          string

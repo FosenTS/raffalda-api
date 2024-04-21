@@ -70,7 +70,7 @@ func (t *transaction) InsertTransaction(ctx context.Context, transaction *dto.Tr
 		return err
 	}
 
-	warehouse, err := t.warehouseStorage.GetWarehouseById(ctx, transaction.WarehousesId)
+	warehouse, err := t.warehouseStorage.GetWarehouseById(ctx, transaction.WarehouseId)
 	if err != nil {
 		logF.Errorln(err)
 		return err

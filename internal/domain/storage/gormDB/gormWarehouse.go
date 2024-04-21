@@ -231,9 +231,9 @@ func (wR *warehouseRepository) InsertWarehouse(ctx context.Context, w *dto.Wareh
 
 func (wR *warehouseRepository) GetWarehouseById(ctx context.Context, id uint) (*entity.Warehouse, error) {
 	logF := advancedlog.FunctionLog(wR.log)
-	var wirehouse *scheme.Warehouse
+	var warehouse *scheme.Warehouse
 
-	result := wR.db.Where("id = ?", id).First(&wirehouse)
+	result := wR.db.Where("id = ?", id).First(&warehouse)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, nil
@@ -244,10 +244,10 @@ func (wR *warehouseRepository) GetWarehouseById(ctx context.Context, id uint) (*
 	}
 
 	return &entity.Warehouse{
-		ID:       wirehouse.ID,
-		Name:     wirehouse.Name,
-		Volume:   wirehouse.Volume,
-		Capacity: wirehouse.Capacity,
+		ID:       warehouse.ID,
+		Name:     warehouse.Name,
+		Volume:   warehouse.Volume,
+		Capacity: warehouse.Capacity,
 	}, nil
 }
 
