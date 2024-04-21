@@ -21,6 +21,7 @@ func (h *handlerApi) RegisterGroup(g fiber.Router) {
 	g.Post("/storeWarehouse", h.StoreWarehouse)
 	g.Delete("/deleteWarehouse", h.DeleteWarehouse)
 	g.Get("/getExpireStats", h.GetExpireStats)
+	g.Get("/getWarehouseMapInfoById", h.GetWarehouseMapInfoById)
 
 	g.Post("/storeWarehouseMerchandise", h.StoreWarehouseMerchandise)
 	g.Post("/updateWarehouseMerchandise", h.UpdateWarehouseMerchandise)
@@ -325,6 +326,66 @@ func (h *handlerApi) UpdateWarehouse(ctx *fiber.Ctx) error {
 	}
 
 	return ctx.SendStatus(fiber.StatusOK)
+}
+
+func (h *handlerApi) GetWarehouseMapInfoById(ctx *fiber.Ctx) error {
+	logF := advancedlog.FunctionLog(h.log)
+
+	id := ctx.QueryInt("id")
+	transactionGraph, err := h.transactionService.GetTransactionsStatsByWarehousesId(ctx.Context(), uint(id))
+	if err != nil {
+		logF.Errorln(err)
+		return ctx.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	warehouse, err := h.warehousService.GetById(ctx.Context(), uint(id))
+	if err != nil {
+		logF.Errorln(err)
+		return ctx.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	merchandises, err := h.warehousService.GetWarehouseMerchandiseByWarehouseId(ctx.Context(), uint(id))
+	if err != nil {
+		logF.Errorln(err)
+		return ctx.SendStatus(fiber.StatusInternalServerError)
+	}
+	var top1, top2, top3, top4 *entity.MerchandiseMoreInfo
+	for _, m := range merchandises {
+		if top1 == nil || top1.Quantity < m.Quantity {
+			top4 = top3
+			top3 = top2
+			top2 = top1
+			top1 = m
+		} else if top2 == nil || top2.Quantity < m.Quantity {
+			top4 = top3
+			top3 = top2
+			top2 = m
+		} else if top3 == nil || top3.Quantity < m.Quantity {
+			top4 = top3
+			top3 = m
+		} else if top4 == nil || top4.Quantity < m.Quantity {
+			top4 = m
+		}
+	}
+
+	warehouseMapInfo := entity.WarehouseMapInfo{
+		WarehouseName: warehouse.Name,
+		Volume:        warehouse.Volume,
+		Capacity:      warehouse.Capacity,
+		Monday:        transactionGraph.Monday,
+		Tuesday:       transactionGraph.Tuesday,
+		Wednesday:     transactionGraph.Wednesday,
+		Thursday:      transactionGraph.Thursday,
+		Friday:        transactionGraph.Friday,
+		Saturday:      transactionGraph.Saturday,
+		Sunday:        transactionGraph.Sunday,
+		Top1:          top1,
+		Top2:          top2,
+		Top3:          top3,
+		Top4:          top4,
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(warehouseMapInfo)
 }
 
 func (h *handlerApi) GetWarehouseById(ctx *fiber.Ctx) error {
