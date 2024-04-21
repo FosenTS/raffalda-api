@@ -213,7 +213,7 @@ func (t *transaction) GetTransactionsByWarehousesId(ctx context.Context, id uint
 			t.log.Errorln(err)
 			return nil, err
 		}
-		warehouseMerchandises, err := t.warehouseStorage.GetWarehouseMerchandiseById(ctx, transaction.WarehouseId)
+		warehouseMerchandises, err := t.warehouseStorage.GetWarehouseMerchandiseById(ctx, transaction.MerchandiseId)
 		if err != nil {
 			t.log.Errorln(err)
 			return nil, err
